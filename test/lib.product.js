@@ -6,7 +6,7 @@ import {
 }
 from './field';
 
-var Digikey = require('../lib/product').default;
+var GrabStrategy = require('../lib/product').default;
 
 function checklist(result) {
   result.should.have.keys(ProductFields);
@@ -43,10 +43,10 @@ describe('product page', function() {
       let html = await getHtml(
         'sample.html'
       );
-      let digikey = new Digikey(html,
-        'http://www.digikey.com.cn/search/zh/MAX30100EFD-/MAX30100EFD-ND?recordId=5020894'
+      let grabStrategy = new GrabStrategy(html,
+        'http://www.chip1stop.com/web/TWN/zh/dispDetail.do?partId=TI01-0329806&mpn=INA137UA'
       );
-      let result = await digikey.getResult();
+      let result = await grabStrategy.getResult();
       checklist(result);
       done();
     } catch (e) {
@@ -59,10 +59,10 @@ describe('product page', function() {
       let html = await getHtml(
         'sample.html'
       );
-      let digikey = new Digikey(html,
-        'http://www.digikey.com.cn/search/zh/AFP85151/1110-3837-ND?recordId=5267788'
+      let grabStrategy = new GrabStrategy(html,
+        'http://www.chip1stop.com/web/TWN/zh/dispDetail.do?partId=TI01-0329842&mpn=OPA4364AIPWT'
       );
-      let result = await digikey.getResult();
+      let result = await grabStrategy.getResult();
       checklist(result);
       done();
     } catch (e) {
