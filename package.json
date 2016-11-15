@@ -1,5 +1,5 @@
 {
-  "name": "digikey-cn-scraper",
+  "name": "chip1stop-scraper",
   "private": "true",
   "version": "0.0.1",
   "description": "scraper",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alincode/digikey-cn-scraper"
+    "url": "https://github.com/alincode/chip1stop-scraper"
   },
   "keywords": [
     "scraper"
