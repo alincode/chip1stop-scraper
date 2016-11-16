@@ -1,7 +1,10 @@
 module.exports = {
   ProductFields: [
-    'sku', 'amount', 'mfs', 'pn', 'description', 'attributes',
-    'documents', 'priceStores', 'rohs', 'lead', 'imageUrl', 'pkg',
-    'category'
+    'sku', 'mfs', 'pn', 'description', 'attributes',
+    'priceStores', 'rohs', 'lead', 'category'
+  ],
+  ProductFullFields: [
+    'sku', 'mfs', 'pn', 'description', 'attributes',
+    'priceStores', 'rohs', 'lead', 'category', 'currency', 'amount'
   ]
 };
