@@ -51,10 +51,7 @@ var Product = function () {
       var fields = {};
       fields.priceStores = this.getPriceStores($, fields);
       this.getInfoRows($, fields);
-      this.getSubInfoRows($, fields);
-      fields.attributes = this.getAttrRows($);
-      fields.documents = this.getDocuments($);
-      fields.imageUrl = this.getImageUrl($);
+      fields.attributes = this.getAttrRows($, fields);
       return R.map(function (field) {
         return field === '' ? undefined : field;
       }, fields);
@@ -67,13 +64,15 @@ var Product = function () {
   }, {
     key: 'getRohs',
     value: function getRohs(val) {
-      return val.indexOf('符合限制有害物质指令(RoHS)规范要求') > -1;
+      return val.indexOf('符合RoHS标准') > -1;
     }
   }, {
     key: 'getAmount',
-    value: function getAmount(val) {
+    value: function getAmount($) {
       var that = this;
-      var amount = that.getData(val.split('可立即发货')[0].split(':')[1]);
+      var amount = that.getData($('.itemBuyBg .itemBuyLeft .startText').html());
+      amount = _lodash2.default.trim(amount.split(':')[1]);
+      amount = amount.split(' ')[0];
       amount = amount.replace(',', '');
       return parseInt(amount);
     }
@@ -85,66 +84,26 @@ var Product = function () {
 
       try {
         var that = this;
-        $('#pricingTable tr').each(function (i, elem) {
-          if (i == 0) return;
-          var elemHtml = $(elem).html();
-          var val = $(elem).find('td').html();
-          val = that.getData(val);
-          if (i == 1) fields.sku = val;
-          if (i == 2) fields.amount = that.getAmount(val);
-          if (i == 3) fields.mfs = val;
-          if (i == 4) fields.pn = val;
-          if (i == 5) fields.description = val;
-          if (i == 6) {
+        fields.pn = that.getData($('[itemprop=productID]').html());
+        fields.mfs = that.getData($('[itemprop=manufacturer] a').html());
+
+        if ($('.itemBuyBg').length > 0) {
+          fields.amount = that.getAmount($);
+        }
+
+        $('#itemSpec1 li .box_tu3').each(function (i, elem) {
+          var val = that.getData($(elem).html());
+          if (i == 0) {
             fields.lead = that.getLead(val);
             fields.rohs = that.getRohs(val);
           }
+          if (i == 1) fields.category = val.split(' ')[0];
+          if (i == 3) fields.sku = val.split('：')[1];
         });
       } catch (e) {
         console.error('e:', e.message);
       }
       return fields;
-    }
-
-    // 一般訊息
-
-  }, {
-    key: 'getSubInfoRows',
-    value: function getSubInfoRows($, initFields) {
-      var fields = initFields;
-      var infoRows = [];
-
-      try {
-        var that = this;
-        $('#DatasheetsTable1 tr').each(function (i, elem) {
-          if (i == 0) return;
-          var elemHtml = $(elem).html();
-          var title = $(elem).find('th').html();
-          var val = $(elem).find('td').html();
-          title = that.getData(title);
-          val = that.getData(val);
-          var isExistPkg = title.indexOf('标准包装') != -1;
-          if (isExistPkg) fields.pkg = val;
-          if (title.indexOf('包装') != -1 && !isExistPkg) {
-            fields.pkg_type = val;
-          }
-          if (title == '类别') fields.category = val;
-          if (title == '其它名称') fields.param = val;
-        });
-      } catch (e) {
-        console.error('e:', e.message);
-      }
-      return fields;
-    }
-  }, {
-    key: 'getImageUrl',
-    value: function getImageUrl($) {
-      try {
-        var that = this;
-        return $('.beablock-image img').attr('src');
-      } catch (e) {
-        return;
-      }
     }
   }, {
     key: 'getData',
@@ -154,95 +113,59 @@ var Product = function () {
       });
       return data;
     }
-  }, {
-    key: 'getArrayData',
-    value: function getArrayData($, selector) {
-      var data = htmlToText.fromString($(selector), {
-        wordwrap: 130
-      });
-      return _lodash2.default.split(data, ' ');
-    }
-  }, {
-    key: 'getIndex',
-    value: function getIndex(data, title) {
-      var index = _lodash2.default.findIndex(data, function (o) {
-        return o.indexOf(title) != -1;
-      });
-      return index;
-    }
-  }, {
-    key: 'getValue',
-    value: function getValue(value, title) {
-      if (value.indexOf(title) != -1) {
-        return _lodash2.default.trim(value.substring(title.length + 1));
-      }
-      return;
-    }
-  }, {
-    key: 'getDocuments',
-    value: function getDocuments($) {
-      var that = this;
-      var docRows = [];
-      var docs = [];
-      var docUrl = $('.lnkDatasheet').attr('href');
-      docs.push(docUrl);
-      return docs;
-    }
 
     // 規格
 
   }, {
     key: 'getAttrRows',
-    value: function getAttrRows($) {
+    value: function getAttrRows($, fields) {
       var that = this;
       var attrThRows = [];
       var attrTdRows = [];
       var attrs = [];
 
-      $('#SpecificationTable th').each(function (i, elem) {
-        attrThRows[i] = that.getData($(this).html());
-        attrThRows[i] = attrThRows[i].split('?')[0];
-      });
+      $('.itemSpec2 tr th').each(function (i, elem) {
+        var title = that.getData($(elem).html());
+        var value = that.getData($(elem).next().html());
+        if (value) {
+          var obj = {};
+          obj.key = title;
+          obj.value = value;
+          attrs.push(obj);
 
-      $('#SpecificationTable td').each(function (i, elem) {
-        attrTdRows[i] = that.getData($(this).html());
-      });
-
-      _lodash2.default.forEach(attrThRows, function (value, index) {
-        var obj = {};
-        obj.key = value;
-        obj.value = attrTdRows[index];
-        attrs.push(obj);
+          if (title == '商品信息') fields.description = value;
+        }
       });
       return attrs;
     }
   }, {
-    key: 'getPriceStores',
-    value: function getPriceStores($, initFields) {
+    key: 'getCurrency',
+    value: function getCurrency($) {
       var that = this;
+      var currency = that.getData($('.itemBuyBg .itemBuyRight p')).split('(')[1];
+      currency = currency.replace(')', '');
+      return currency;
+    }
+  }, {
+    key: 'getPriceStoresPrice',
+    value: function getPriceStoresPrice($, elem) {
+      return parseInt($(elem).find('th').html().replace('&#xFF5E;', ''));
+    }
+  }, {
+    key: 'getPriceStores',
+    value: function getPriceStores($, fields) {
+      var that = this;
+      if ($('.itemBuyBg .itemBuyRight p').length == 0) return;
+      fields.currency = that.getCurrency($);
       var dollars = $('.catalog-pricing tr');
       var priceCollection = [];
-      $('.catalog-pricing tr').each(function (i, elem) {
+      $('.itemBuyBg .itemBuyRight table tr').each(function (i, elem) {
         var obj = {};
-        $(elem).find('td').each(function (i, subelem) {
-          var val = $(subelem).html();
-          if (i == 0) obj.amount = parseInt(val.replace(',', ''));
-          if (i == 1) obj.unitPrice = val.substring(7);
-          if (i == 2) priceCollection.push(obj);
-        });
+        obj.amount = that.getPriceStoresPrice($, elem);
+        obj.unitPrice = that.getData($(elem).find('td').html());
+        priceCollection.push(obj);
       });
-      $('.catalog-pricing tr').remove();
       return priceCollection;
-    }
-  }, {
-    key: 'validate',
-    value: function validate(opts) {
-      return true;
-    }
-  }, {
-    key: 'buildUrl',
-    value: function buildUrl(opts) {
-      return opts.url;
     }
   }]);
 
