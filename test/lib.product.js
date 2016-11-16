@@ -2,16 +2,14 @@ import fs from 'fs';
 import path from 'path';
 
 import {
-  ProductFields
+  ProductFields, ProductFullFields
 }
 from './field';
 
 var GrabStrategy = require('../lib/product').default;
 
 function checklist(result) {
-  result.should.have.keys(ProductFields);
   result.sku.should.be.a('string');
-  result.amount.should.be.a('number');
   result.mfs.should.be.a('string');
   result.pn.should.be.a('string');
   result.description.should.be.a('string');
@@ -20,12 +18,6 @@ function checklist(result) {
   result.attributes.should.be.a('array');
   result.attributes.length.should.above(0);
   result.attributes[0].should.have.keys(['key', 'value']);
-  result.documents.should.be.a('array');
-  result.documents.length.should.above(0);
-  result.priceStores.should.be.a('array');
-  result.priceStores.length.should.above(0);
-  result.priceStores[0].should.have.keys(['amount', 'unitPrice']);
-  result.priceStores[0].amount.should.be.a('number');
 }
 
 function getHtml(fileName) {
@@ -47,6 +39,7 @@ describe('product page', function() {
         'http://www.chip1stop.com/web/TWN/zh/dispDetail.do?partId=TI01-0329806&mpn=INA137UA'
       );
       let result = await grabStrategy.getResult();
+      result.should.have.keys(ProductFields);
       checklist(result);
       done();
     } catch (e) {
@@ -57,13 +50,20 @@ describe('product page', function() {
   it('case 2', async(done) => {
     try {
       let html = await getHtml(
-        'sample.html'
+        'sample2.html'
       );
       let grabStrategy = new GrabStrategy(html,
-        'http://www.chip1stop.com/web/TWN/zh/dispDetail.do?partId=TI01-0329842&mpn=OPA4364AIPWT'
+        'http://www.chip1stop.com/web/TWN/zh/dispDetail.do?partId=STMI-0041892&mpn=L298N'
       );
       let result = await grabStrategy.getResult();
+      result.should.have.keys(ProductFullFields);
       checklist(result);
+      result.currency.should.be.a('string');
+      result.amount.should.be.a('number');
+      result.priceStores.should.be.a('array');
+      result.priceStores.length.should.above(0);
+      result.priceStores[0].should.have.keys(['amount', 'unitPrice']);
+      result.priceStores[0].amount.should.be.a('number');
       done();
     } catch (e) {
       done(e);
