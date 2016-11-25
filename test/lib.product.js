@@ -13,8 +13,8 @@ function checklist(result) {
   result.mfs.should.be.a('string');
   result.pn.should.be.a('string');
   // result.description.should.be.a('string');
-  result.lead.should.be.a('boolean');
-  result.rohs.should.be.a('boolean');
+  // result.lead.should.be.a('boolean');
+  // result.rohs.should.be.a('boolean');
   result.attributes.should.be.a('array');
   result.attributes.length.should.above(0);
   result.attributes[0].should.have.keys(['key', 'value']);
