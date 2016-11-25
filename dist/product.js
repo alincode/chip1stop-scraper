@@ -77,29 +77,48 @@ var Product = function () {
       return parseInt(amount);
     }
   }, {
+    key: 'isPhaseOut',
+    value: function isPhaseOut($) {
+      return $('#itemSpec1 .box_tu3 span.bold.red').length > 0;
+    }
+  }, {
     key: 'getInfoRows',
     value: function getInfoRows($, initFields) {
+      var _this2 = this;
+
       var fields = initFields;
       var infoRows = [];
 
       try {
-        var that = this;
-        fields.pn = that.getData($('[itemprop=productID]').html());
-        fields.mfs = that.getData($('[itemprop=manufacturer] a').html());
+        var that;
 
-        if ($('.itemBuyBg').length > 0) {
-          fields.amount = that.getAmount($);
-        }
+        (function () {
+          that = _this2;
 
-        $('#itemSpec1 li .box_tu3').each(function (i, elem) {
-          var val = that.getData($(elem).html());
-          if (i == 0) {
-            fields.lead = that.getLead(val);
-            fields.rohs = that.getRohs(val);
+          fields.pn = that.getData($('[itemprop=productID]').html());
+          fields.mfs = that.getData($('[itemprop=manufacturer] a').html());
+
+          if ($('.itemBuyBg').length > 0) {
+            fields.amount = that.getAmount($);
           }
-          if (i == 1) fields.category = val.split(' ')[0];
-          if (i == 3) fields.sku = val.split('：')[1];
-        });
+
+          var isExistLeadRow = true;
+          $('#itemSpec1 li').each(function (i, elem) {
+            var val = that.getData($(elem).html());
+            if (isExistLeadRow && i == 0 && val == '') isExistLeadRow = false;
+            if (isExistLeadRow) {
+              if (i == 0) {
+                fields.lead = that.getLead(val);
+                fields.rohs = that.getRohs(val);
+              }
+              if (i == 2) fields.category = val.split(' ')[0];
+              if (i == 5) fields.sku = val.split('：')[1];
+            } else {
+              if (i == 3) fields.category = val.split(' ')[0];
+              if (i == 6) fields.sku = val.split('：')[1];
+            }
+          });
+        })();
       } catch (e) {
         console.error('e:', e.message);
       }
