@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import {
-  ProductFields, ProductFullFields
+  ProductFields, ProductFields2, ProductFullFields
 }
 from './field';
 
@@ -12,7 +12,7 @@ function checklist(result) {
   result.sku.should.be.a('string');
   result.mfs.should.be.a('string');
   result.pn.should.be.a('string');
-  result.description.should.be.a('string');
+  // result.description.should.be.a('string');
   result.lead.should.be.a('boolean');
   result.rohs.should.be.a('boolean');
   result.attributes.should.be.a('array');
@@ -57,6 +57,29 @@ describe('product page', function() {
       );
       let result = await grabStrategy.getResult();
       result.should.have.keys(ProductFullFields);
+      checklist(result);
+      result.currency.should.be.a('string');
+      result.amount.should.be.a('number');
+      result.priceStores.should.be.a('array');
+      result.priceStores.length.should.above(0);
+      result.priceStores[0].should.have.keys(['amount', 'unitPrice']);
+      result.priceStores[0].amount.should.be.a('number');
+      done();
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('case 3', async(done) => {
+    try {
+      let html = await getHtml(
+        'sample3.html'
+      );
+      let grabStrategy = new GrabStrategy(html,
+        'http://www.chip1stop.com/web/CHN/zh/dispDetail.do?partId=MAXI-0011689'
+      );
+      let result = await grabStrategy.getResult();
+      result.should.have.keys(ProductFields2);
       checklist(result);
       result.currency.should.be.a('string');
       result.amount.should.be.a('number');
