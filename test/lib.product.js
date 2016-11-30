@@ -15,6 +15,9 @@ function checklist(result) {
   // result.description.should.be.a('string');
   // result.lead.should.be.a('boolean');
   // result.rohs.should.be.a('boolean');
+}
+
+function checklistWithAttributes(result) {
   result.attributes.should.be.a('array');
   result.attributes.length.should.above(0);
   result.attributes[0].should.have.keys(['key', 'value']);
@@ -41,6 +44,7 @@ describe('product page', function() {
       let result = await grabStrategy.getResult();
       result.should.have.keys(ProductFields);
       checklist(result);
+      checklistWithAttributes(result);
       done();
     } catch (e) {
       done(e);
@@ -58,6 +62,7 @@ describe('product page', function() {
       let result = await grabStrategy.getResult();
       result.should.have.keys(ProductFullFields);
       checklist(result);
+      checklistWithAttributes(result);
       result.currency.should.be.a('string');
       result.amount.should.be.a('number');
       result.priceStores.should.be.a('array');
@@ -77,6 +82,30 @@ describe('product page', function() {
       );
       let grabStrategy = new GrabStrategy(html,
         'http://www.chip1stop.com/web/CHN/zh/dispDetail.do?partId=MAXI-0011689'
+      );
+      let result = await grabStrategy.getResult();
+      result.should.have.keys(ProductFields2);
+      checklist(result);
+      checklistWithAttributes(result);
+      result.currency.should.be.a('string');
+      result.amount.should.be.a('number');
+      result.priceStores.should.be.a('array');
+      result.priceStores.length.should.above(0);
+      result.priceStores[0].should.have.keys(['amount', 'unitPrice']);
+      result.priceStores[0].amount.should.be.a('number');
+      done();
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('case 4', async(done) => {
+    try {
+      let html = await getHtml(
+        'sample4.html'
+      );
+      let grabStrategy = new GrabStrategy(html,
+        'http://www.chip1stop.com/web/CHN/zh/search.do?keyword=FF62268225'
       );
       let result = await grabStrategy.getResult();
       result.should.have.keys(ProductFields2);
