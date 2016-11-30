@@ -103,6 +103,7 @@ var Product = function () {
           }
 
           var isExistLeadRow = true;
+          var isExistCategory = false;
           $('#itemSpec1 li').each(function (i, elem) {
             var val = that.getData($(elem).html());
             if (isExistLeadRow && i == 0 && val == '') isExistLeadRow = false;
@@ -114,8 +115,17 @@ var Product = function () {
               if (i == 2) fields.category = val.split(' ')[0];
               if (i == 5) fields.sku = val.split('：')[1];
             } else {
-              if (i == 3) fields.category = val.split(' ')[0];
-              if (i == 6) fields.sku = val.split('：')[1];
+              if (i == 2) {
+                isExistCategory = val.indexOf('没有定义') == -1;
+              }
+
+              if (isExistCategory) {
+                if (i == 3) fields.category = val.split(' ')[0];
+                if (i == 6) fields.sku = val.split('：')[1];
+              } else {
+                if (i == 2) fields.category = val.split(' ')[0];
+                if (i == 5) fields.sku = val.split('：')[1];
+              }
             }
           });
         })();
