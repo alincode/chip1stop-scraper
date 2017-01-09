@@ -70,6 +70,7 @@ var Product = function () {
     key: 'getAmount',
     value: function getAmount($) {
       var that = this;
+      if ($('.itemBuyBg .itemBuyLeft .startText').length == 0) return 0;
       var amount = that.getData($('.itemBuyBg .itemBuyLeft .startText').html());
       amount = _lodash2.default.trim(amount.split(':')[1]);
       amount = amount.split(' ')[0];
@@ -97,13 +98,13 @@ var Product = function () {
 
           fields.pn = that.getData($('[itemprop=productID]').html());
           fields.mfs = that.getData($('[itemprop=manufacturer] a').html());
-
-          if ($('.itemBuyBg').length > 0) {
-            fields.amount = that.getAmount($);
-          }
+          fields.sku = that.getData($('div.box_tu3').text()).split('： ')[1];
+          fields.category = that.getData($('h3.box_tu3').text());
+          fields.amount = that.getAmount($);
 
           var isExistLeadRow = true;
           var isExistCategory = false;
+
           $('#itemSpec1 li').each(function (i, elem) {
             var val = that.getData($(elem).html());
             if (isExistLeadRow && i == 0 && val == '') isExistLeadRow = false;
@@ -112,19 +113,9 @@ var Product = function () {
                 fields.lead = that.getLead(val);
                 fields.rohs = that.getRohs(val);
               }
-              if (i == 2) fields.category = val.split(' ')[0];
-              if (i == 5) fields.sku = val.split('：')[1];
             } else {
               if (i == 2) {
                 isExistCategory = val.indexOf('没有定义') == -1;
-              }
-
-              if (isExistCategory) {
-                if (i == 3) fields.category = val.split(' ')[0];
-                if (i == 6) fields.sku = val.split('：')[1];
-              } else {
-                if (i == 2) fields.category = val.split(' ')[0];
-                if (i == 5) fields.sku = val.split('：')[1];
               }
             }
           });
@@ -171,6 +162,7 @@ var Product = function () {
     key: 'getCurrency',
     value: function getCurrency($) {
       var that = this;
+      if ($('.itemBuyBg .itemBuyRight p').length == 0) return 'USD';
       var currency = that.getData($('.itemBuyBg .itemBuyRight p')).split('(')[1];
       currency = currency.replace(')', '');
       return currency;
@@ -184,8 +176,8 @@ var Product = function () {
     key: 'getPriceStores',
     value: function getPriceStores($, fields) {
       var that = this;
-      if ($('.itemBuyBg .itemBuyRight p').length == 0) return;
       fields.currency = that.getCurrency($);
+      if ($('.itemBuyBg .itemBuyRight p').length == 0) return [];
       var dollars = $('.catalog-pricing tr');
       var priceCollection = [];
       $('.itemBuyBg .itemBuyRight table tr').each(function (i, elem) {
