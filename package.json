@@ -1,7 +1,7 @@
 {
   "name": "chip1stop-scraper",
   "private": "true",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "scraper",
   "main": "dist/product.js",
   "scripts": {
