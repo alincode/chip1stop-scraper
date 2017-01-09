@@ -121,4 +121,24 @@ describe('product page', function() {
       done(e);
     }
   });
+
+  it('case 5', async(done) => {
+    try {
+      let html = await getHtml(
+        'sample5.html'
+      );
+      let grabStrategy = new GrabStrategy(html,
+        'http://www.chip1stop.com/web/TWN/zh/dispDetail.do?partId=NDCS-0000036&mpn=LSR-16M'
+      );
+      let result = await grabStrategy.getResult();
+      result.should.have.keys(ProductFields2);
+      checklist(result);
+      result.currency.should.be.a('string');
+      result.amount.should.be.a('number');
+      result.priceStores.should.be.a('array');
+      done();
+    } catch (e) {
+      done(e);
+    }
+  });
 });
